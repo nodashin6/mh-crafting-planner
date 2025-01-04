@@ -1,1 +1,3 @@
-# mh-crafting-planner
+# MH Crafting Planner
+
+github copilotを試している。
