@@ -45,3 +45,14 @@ class ShipmentPlanCsv(CsvModelType):
     item_code: int
     weight: int
     client: str
+
+
+class MasterDataCsv(BaseModel):
+    items: list[ItemCsv]
+    mixers: list[MixerCsv]
+    recipes: list[RecipeCsv]
+
+
+class TransactionDataCsv(BaseModel):
+    purchasing_plans: list[PurchasingPlanCsv]
+    shipment_plans: list[ShipmentPlanCsv]

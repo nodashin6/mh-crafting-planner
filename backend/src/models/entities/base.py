@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date, time
+from ...types.unit import UnitType
 
 
 class BaseEntity(BaseModel):
@@ -13,6 +14,6 @@ class BasePlan(BaseModel):
     time: time
 
 
-class BaseItemWeightPlan(BasePlan):
-    item_code: int
-    weight: int
+class BaseQuantifiable(BaseModel):
+    quantity: float
+    unit: UnitType

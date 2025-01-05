@@ -11,10 +11,11 @@ from .csv_interface import (
     CsvAdapterColumn,
     CsvLoaderConfig,
     BaseCsvLoader,
-    CsvModelType,
     T,
     MASTER_CSV_DIR,
     TRANSACTION_CSV_DIR,
+    BaseMasterCsvLoader,
+    BaseTransactionCsvLoader,
 )
 
 from .csv_models import (
@@ -23,6 +24,8 @@ from .csv_models import (
     RecipeCsv,
     PurchasingPlanCsv,
     ShipmentPlanCsv,
+    MasterDataCsv,
+    TransactionDataCsv,
 )
 
 
@@ -130,3 +133,26 @@ class PurchasingPlanCsvLoader(BaseCsvLoader, Generic[T]):
 class ShipmentPlanCsvLoader(BaseCsvLoader, Generic[T]):
     def __init__(self, config=SHIPMENT_PLAN_CSV_LOADER_CONFIG):
         super().__init__(config)
+
+
+class MasterCsvLoader(BaseMasterCsvLoader):
+    def __init__(self):
+        pass
+
+    def load(self) -> MasterDataCsv:
+        items = ItemCsvLoader().load()
+        mixers = MixedCsvLoader().load()
+        recipes = RecipeCsvLoader().load()
+        return MasterDataCsv(items=items, mixers=mixers, recipes=recipes)
+
+
+class TransactionCsvLoader(BaseTransactionCsvLoader):
+    def __init__(self):
+        pass
+
+    def load(self) -> TransactionDataCsv:
+        purchasing_plans = PurchasingPlanCsvLoader().load()
+        shipment_plans = ShipmentPlanCsvLoader().load()
+        return TransactionDataCsv(
+            purchasing_plans=purchasing_plans, shipment_plans=shipment_plans
+        )

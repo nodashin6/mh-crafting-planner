@@ -11,6 +11,10 @@ from src.db.local.csv_loader import (
     RecipeCsvLoader,
     PurchasingPlanCsvLoader,
     ShipmentPlanCsvLoader,
+    MasterCsvLoader,
+    MasterDataCsv,
+    TransactionCsvLoader,
+    TransactionDataCsv,
 )
 
 
@@ -71,3 +75,20 @@ def test_shipment_plan_csv_loader():
     assert isinstance(shipment_plan.item_code, int)
     assert isinstance(shipment_plan.weight, int)
     assert isinstance(shipment_plan.client, str)
+
+
+def test_master_csv_loader():
+    loader = MasterCsvLoader()
+    master_data = loader.load()
+    assert isinstance(master_data, MasterDataCsv)
+    assert 0 < len(master_data.items)
+    assert 0 < len(master_data.mixers)
+    assert 0 < len(master_data.recipes)
+
+
+def test_transaction_csv_loader():
+    loader = TransactionCsvLoader()
+    transaction_data = loader.load()
+    assert isinstance(transaction_data, TransactionDataCsv)
+    assert 0 < len(transaction_data.purchasing_plans)
+    assert 0 < len(transaction_data.shipment_plans)

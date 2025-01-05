@@ -5,7 +5,7 @@ from typing import Type, Generic, TypeVar, Iterator, Callable, Dict, Tuple, Name
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import date, time
-from .csv_models import CsvModelType
+from .csv_models import CsvModelType, MasterDataCsv, TransactionDataCsv
 from ...const import MASTER_CSV_DIR, TRANSACTION_CSV_DIR
 
 #
@@ -60,3 +60,21 @@ class BaseCsvLoader(ABC, Generic[T]):
 
     def _adapt(self, row: pd.Series) -> T:
         return adapt(row, self.config.adapter)
+
+
+class BaseMasterCsvLoader(ABC):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def load(self) -> MasterDataCsv:
+        pass
+
+
+class BaseTransactionCsvLoader(ABC):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def load(self) -> TransactionDataCsv:
+        pass
