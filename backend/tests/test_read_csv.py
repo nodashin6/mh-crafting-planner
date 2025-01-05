@@ -1,9 +1,4 @@
-import sys
-from pathlib import Path
 from datetime import date, time
-
-# Add the src directory to the Python path
-sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
 
 from src.db.local.csv_loader import (
     ItemCsvLoader,

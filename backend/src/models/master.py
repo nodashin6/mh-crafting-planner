@@ -7,7 +7,7 @@ from .entities import (
 from pydantic import BaseModel
 
 
-class Master(BaseModel):
+class CraftingMaster(BaseModel):
     items: list[Item]
     mixers: list[Mixer]
     recipes: list[Recipe]

@@ -7,14 +7,14 @@ from .entities import (
     PurchasingPlan,
     ShipmentPlan,
 )
-from .master import Master
+from .master import CraftingMaster
 from pydantic import BaseModel
 
 
-class MaterialTransaction(BaseModel):
+class ItemTransaction(BaseModel):
     purchasing_plans: list[PurchasingPlan]
     shipment_plans: list[ShipmentPlan]
 
 
-class Shedule(BaseModel):
+class CraftSchedule(BaseModel):
     procurement_plans: list[ProcurementPlan]
