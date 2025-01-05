@@ -1,87 +1,29 @@
 from abc import ABC, abstractmethod
 import pandas as pd
 from pydantic import BaseModel, Field
-from typing import Type, Generic, TypeVar, Iterator
+from typing import Type, Generic, TypeVar, Iterator, Callable
 from pathlib import Path
 from dataclasses import dataclass
+from datetime import date, time
 
-from ...const import MASTER_CSV_DIR, TRANSACTION_CSV_DIR
-from ...models import Item, Mixer
+from .csv_interface import (
+    CsvAdapter,
+    CsvAdapterColumn,
+    CsvLoaderConfig,
+    BaseCsvLoader,
+    CsvModelType,
+    T,
+    MASTER_CSV_DIR,
+    TRANSACTION_CSV_DIR,
+)
 
-
-#
-# Config And Adapter
-#
-T = TypeVar("T", bound=BaseModel)
-
-
-class CsvAdapterColumn(BaseModel):
-    column: str
-    dtype: Type
-
-
-class CsvAdapter(BaseModel, Generic[T]):
-    ModelType: Type[T]
-    columns: dict[str, CsvAdapterColumn]
-
-
-def CsvAdapterInterface(
-    ModelType: Type[T], columns: dict[str, tuple[str, Type]]
-) -> CsvAdapter[T]:
-    """create CsvAdapter instance
-
-    Args:
-        ModelType (Type[T]): ...
-        columns (dict[str, tuple[str, Type]]): ...
-
-    Returns:
-        CsvAdapter[T]: ...
-    """
-    adapter_columns = {}
-    for key, value in columns.items():
-        adapter_columns[key] = CsvAdapterColumn(column=value[0], dtype=value[1])
-    return CsvAdapter[T](ModelType=ModelType, columns=adapter_columns)
-
-
-class CsvLoaderConfig(BaseModel):
-    save_dir: Path
-    basename: str
-    encoding: str = Field("utf-8")
-    adapter: CsvAdapter[T] = Field(None)
-
-
-def adapt(row: pd.Series, adapter: CsvAdapter[T]) -> T:
-    kwargs = {}
-    for key, value in adapter.columns.items():
-        kwargs[key] = value.dtype(row[value.column])
-    return adapter.ModelType(**kwargs)
-
-
-#
-# CsvLoader
-#
-class BaseCsvLoader(ABC, Generic[T]):
-
-    def __init__(self, config: CsvLoaderConfig):
-        self.config = config
-
-    @property
-    def csv_path(self) -> Path:
-        return (self.config.save_dir / self.config.basename).with_suffix(".csv")
-
-    def read(self) -> pd.DataFrame:
-        return pd.read_csv(self.csv_path, encoding=self.config.encoding)
-
-    def __iter__(self) -> Iterator[T]:
-        df = self.read()
-        for _, row in df.iterrows():
-            yield self._adapt(row)
-
-    def load(self) -> list[T]:
-        return list(self)
-
-    def _adapt(self, row: pd.Series) -> T:
-        return adapt(row, self.config.adapter)
+from .csv_models import (
+    ItemCsv,
+    MixerCsv,
+    RecipeCsv,
+    PurchasingPlanCsv,
+    ShipmentPlanCsv,
+)
 
 
 #
@@ -90,12 +32,12 @@ class BaseCsvLoader(ABC, Generic[T]):
 ITEM_CSV_LOADER_CONFIG = CsvLoaderConfig(
     save_dir=MASTER_CSV_DIR,
     basename="items",
-    adapter=CsvAdapterInterface(
-        ModelType=Item,
+    adapter=CsvAdapter(
+        ModelType=ItemCsv,
         columns={
-            "code": ("Code", int),
-            "name": ("Name", str),
-            "leadtime": ("Leadtime", float),
+            "code": CsvAdapterColumn("Code", int),
+            "name": CsvAdapterColumn("Name", str),
+            "leadtime": CsvAdapterColumn("Leadtime", float),
         },
     ),
 )
@@ -103,14 +45,60 @@ ITEM_CSV_LOADER_CONFIG = CsvLoaderConfig(
 MIXER_CSV_LOADER_CONFIG = CsvLoaderConfig(
     save_dir=MASTER_CSV_DIR,
     basename="mixers",
-    adapter=CsvAdapterInterface(
-        ModelType=Mixer,
+    adapter=CsvAdapter(
+        ModelType=MixerCsv,
         columns={
-            "code": ("Code", int),
-            "name": ("Name", str),
-            "capacity": ("Capacity", int),
-            "speed": ("Speed", float),
-            "changeover_time": ("ChangeoverTime", float),
+            "code": CsvAdapterColumn("Code", int),
+            "name": CsvAdapterColumn("Name", str),
+            "capacity": CsvAdapterColumn("Capacity", int),
+            "speed": CsvAdapterColumn("Speed", float),
+            "changeover_time": CsvAdapterColumn("ChangeoverTime", float),
+        },
+    ),
+)
+
+RECIPE_CSV_LOADER_CONFIG = CsvLoaderConfig(
+    save_dir=MASTER_CSV_DIR,
+    basename="recipes",
+    adapter=CsvAdapter(
+        ModelType=RecipeCsv,
+        columns={
+            "input1": CsvAdapterColumn("Input1", str),
+            "input2": CsvAdapterColumn("Input2", str),
+            "output": CsvAdapterColumn("Output", str),
+            "process_yield": CsvAdapterColumn("Yield", float),
+        },
+    ),
+)
+
+PURCHASE_PLAN_CSV_LOADER_CONFIG = CsvLoaderConfig(
+    save_dir=TRANSACTION_CSV_DIR,
+    basename="purchasing_plan",
+    adapter=CsvAdapter(
+        ModelType=PurchasingPlanCsv,
+        columns={
+            "code": CsvAdapterColumn("Code", int),
+            "date": CsvAdapterColumn("Date", str),
+            "time": CsvAdapterColumn("Time", str),
+            "item_code": CsvAdapterColumn("ItemCode", int),
+            "weight": CsvAdapterColumn("Weight", int),
+            "supplier": CsvAdapterColumn("Supplier", str),
+        },
+    ),
+)
+
+SHIPMENT_PLAN_CSV_LOADER_CONFIG = CsvLoaderConfig(
+    save_dir=TRANSACTION_CSV_DIR,
+    basename="shipment_plan",
+    adapter=CsvAdapter(
+        ModelType=ShipmentPlanCsv,
+        columns={
+            "code": CsvAdapterColumn("Code", int),
+            "date": CsvAdapterColumn("Date", str),
+            "time": CsvAdapterColumn("Time", str),
+            "item_code": CsvAdapterColumn("ItemCode", int),
+            "weight": CsvAdapterColumn("Weight", int),
+            "client": CsvAdapterColumn("Client", str),
         },
     ),
 )
@@ -125,4 +113,20 @@ class ItemCsvLoader(BaseCsvLoader, Generic[T]):
 class MixedCsvLoader(BaseCsvLoader, Generic[T]):
 
     def __init__(self, config=MIXER_CSV_LOADER_CONFIG):
+        super().__init__(config)
+
+
+class RecipeCsvLoader(BaseCsvLoader, Generic[T]):
+
+    def __init__(self, config=RECIPE_CSV_LOADER_CONFIG):
+        super().__init__(config)
+
+
+class PurchasingPlanCsvLoader(BaseCsvLoader, Generic[T]):
+    def __init__(self, config=PURCHASE_PLAN_CSV_LOADER_CONFIG):
+        super().__init__(config)
+
+
+class ShipmentPlanCsvLoader(BaseCsvLoader, Generic[T]):
+    def __init__(self, config=SHIPMENT_PLAN_CSV_LOADER_CONFIG):
         super().__init__(config)

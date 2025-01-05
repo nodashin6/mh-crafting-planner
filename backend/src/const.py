@@ -1,7 +1,8 @@
 from pathlib import Path
 
+REPOSITORY_DIR = Path(__file__).parent.parent.parent
 BACKEND_DIR = Path(__file__).parent.parent
-DATA_DIR = BACKEND_DIR / "data"
+DATA_DIR = REPOSITORY_DIR / "storage" / "data"
 CSV_DIR = DATA_DIR / "csv"
 JSON_DIR = DATA_DIR / "json"
 
