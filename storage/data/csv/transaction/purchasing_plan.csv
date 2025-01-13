@@ -1,4 +1,4 @@
-Code,Date,Time,ItemCode,Weight,Supplier
+code,date,time,item_code,weight,supplier
 1,2025-01-01,08:00,1,1000,Shop-A
 2,2025-01-01,10:00,2,500,Shop-A
 3,2025-01-01,12:00,3,500,Shop-A

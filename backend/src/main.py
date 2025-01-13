@@ -1,12 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import (
-    item_router,
-    recipe_router,
-    mixer_router,
-    procurement_plan_router,
-    shipment_plan_router,
-)
+from .core import supabase_client
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -19,13 +14,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(item_router.router, prefix="/api")
-app.include_router(recipe_router.router, prefix="/api")
-app.include_router(mixer_router.router, prefix="/api")
-app.include_router(procurement_plan_router.router, prefix="/api")
-app.include_router(shipment_plan_router.router, prefix="/api")
+@app.get("/ping")
+def ping():
+    return {"message": "pong"}
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the MH Crafting Planner Backend"}
+
+@app.get("/api/v1/items")
+def fetch_items():
+    response = supabase_client().table("items").select("*").execute()
+    return JSONResponse(content=response.data)
+
+@app.get("/api/v1/mixers")
+def fetch_mixers():
+    response = supabase_client().table("mixers").select("*").execute()
+    return JSONResponse(content=response.data)
+
+@app.get("/api/v1/recipes")
+def  fetch_recipes():
+    response = supabase_client().table("recipes").select("*").execute()
+    return JSONResponse(content=response.data)

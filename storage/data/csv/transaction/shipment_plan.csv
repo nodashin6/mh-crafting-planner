@@ -1,4 +1,4 @@
-Code,Date,Time,ItemCode,Weight,Client
+code,date,time,item_code,weight,client
 1,2025-02-01,10:00,3,500,Client-A
 2,2025-02-01,12:00,7,500,Client-A
 3,2025-02-01,14:00,8,500,Client-A

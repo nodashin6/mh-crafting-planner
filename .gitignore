@@ -1,4 +1,5 @@
-*/.env
-*/.pytest_cache/
+.env*
+!.env.example
+.pytest_cache/
 
 .vscode/

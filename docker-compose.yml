@@ -1,0 +1,74 @@
+name: mcp
+
+services:
+  backend:
+    container_name: mcp-backend
+    image: weastur/poetry:1.8.3-python-3.12.4-bookworm
+    build:
+      context: ./backend
+      dockerfile: ./backend/Dockerfile
+    ports:
+      - "8021:8021"
+    volumes:
+      - ./backend:/code
+    environment:
+      - SUPABASE_URL=http://${GATEWAY_IPv4}:${SUPABASE_PORT}
+      - SUPABASE_KEY=${SUPABASE_ANON_KEY}
+      - BACKEND_PORT=${BACKEND_PORT}
+    tty: true
+    stdin_open: true
+    networks:
+      - app-network
+      - supabase-network
+
+  frontend:
+    container_name: mcp-frontend
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    develop:
+      watch:
+        - action: sync # <- ここ
+          path: ./frontend 
+          target: /app/frontend
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+    volumes:
+      - ./frontend:/app/frontend
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=http://${GATEWAY_IPv4}:${SUPABASE_PORT}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - BACKEND_URL=http://backend:${BACKEND_PORT}
+    tty: true
+    stdin_open: true
+    networks:
+      - app-network
+
+  website:
+    container_name: mcp-website
+    build: ./website
+    ports:
+      - "80:80"
+    volumes:
+      - ./website:/app/website
+    depends_on:
+      - frontend
+    environment:
+      - SUPABASE_URL=http://${GATEWAY_IPv4}:${SUPABASE_PORT}
+      - SUPABASE_KEY=${SUPABASE_ANON_KEY}
+      - BACKEND_URL=http://backend:${BACKEND_PORT}
+    tty: true
+    stdin_open: true
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
+
+  supabase-network:
+    external: true
