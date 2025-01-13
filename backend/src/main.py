@@ -30,6 +30,11 @@ def fetch_mixers():
     return JSONResponse(content=response.data)
 
 @app.get("/api/v1/recipes")
-def  fetch_recipes():
+def fetch_recipes():
     response = supabase_client().table("recipes").select("*").execute()
+    return JSONResponse(content=response.data)
+
+@app.get("/api/v1/shipments")
+def fetch_shipments():
+    response = supabase_client().table("shipments").select("*").execute()
     return JSONResponse(content=response.data)
