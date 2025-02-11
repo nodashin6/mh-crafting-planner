@@ -3,10 +3,8 @@ name: mcp
 services:
   backend:
     container_name: mcp-backend
-    image: weastur/poetry:1.8.3-python-3.12.4-bookworm
     build:
       context: ./backend
-      dockerfile: ./backend/Dockerfile
     ports:
       - "8021:8021"
     volumes:
@@ -19,7 +17,8 @@ services:
     stdin_open: true
     networks:
       - app-network
-      - supabase-network
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   frontend:
     container_name: mcp-frontend
@@ -47,6 +46,8 @@ services:
     stdin_open: true
     networks:
       - app-network
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   website:
     container_name: mcp-website
@@ -65,10 +66,9 @@ services:
     stdin_open: true
     networks:
       - app-network
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
 networks:
   app-network:
-    external: true
-
-  supabase-network:
     external: true

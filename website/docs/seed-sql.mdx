@@ -1,0 +1,24 @@
+
+
+こんな処理を書きたい
+
+```text
+craft_id = generate_uuid()
+crafts <-- (craft_id, '回復薬', yeild=0.90),
+precursors <-- (generate_uuid(), item_id == (where item_name == '薬草'), craft_id),
+precursors <-- (generate_uuid(), item_id == (where item_name == 'アオキノコ'), craft_id),
+products <-- (generate_uuid(), item_id == (where item_name == '回復薬'), craft_id),
+
+# --------------------------------------------------
+
+craft_id = generate_uuid()
+crafts <-- (craft_id, '回復薬G', yeild=0.90),
+precursors <-- (generate_uuid(), item_id == (where item_name == '回復薬'), craft_id),
+precursors <-- (generate_uuid(), item_id == (where item_name == 'ハチミツ'), craft_id),
+products <-- (generate_uuid(), item_id == (where item_name == '回復薬G'), craft_id),
+
+# --------------------------------------------------
+
+```
+
+事前にjsonで定義しておいて、効率よく書きたい。
