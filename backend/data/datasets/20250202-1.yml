@@ -1,0 +1,36 @@
+budget: 1000
+stocks: 
+  - マンドラゴラ: 0
+  - ハチミツ: 0
+  - にが虫: 0
+  - 不死虫: 0
+  - げどく草: 0
+  - 薬草: 0
+  - アオキノコ: 0
+
+mixers:
+  - name: mixer1
+    capacity: 100
+    required_time: 5
+    chageover_time: 4
+  
+  - name: mixer2
+    capacity: 200
+    required_time: 10
+    chageover_time: 4
+
+  - name: mixer3
+    capacity: 400
+    required_time: 20
+    chageover_time: 4
+
+  - name: mixer4
+    capacity: 800
+    required_time: 40
+    chageover_time: 4
+
+demands:
+  - random_seed: 0
+    min_demand: 100
+    max_demand: 200
+    due_per_hour: 16
