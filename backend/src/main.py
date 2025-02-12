@@ -19,7 +19,6 @@ app.add_middleware(
 def ping():
     return {"message": "pong"}
 
-
 @app.get("/api/v1/items")
 def fetch_items():
     response = supabase_client().table("items").select("*").execute()
@@ -36,7 +35,6 @@ def fetch_mixers():
 def fetch_recipes():
     response = supabase_client().table("recipes").select("*").execute()
     return JSONResponse(content=response.data)
-
 
 @app.get("/api/v1/markets")
 def fetch_shipments():
