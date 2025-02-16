@@ -1,7 +1,8 @@
 CREATE TABLE mixers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     max_capacity INT NOT NULL,
-    changeover_hours INT NOT NULL
+    changeover_hours INT NOT NULL,
+    default_facility BOOLEAN NOT NULL
 );
 
 CREATE TABLE crafts (

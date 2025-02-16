@@ -1,6 +1,7 @@
 CREATE TABLE savedatas (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     player_id UUID NOT NULL REFERENCES players(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    name TEXT NOT NULL,
     gold INT NOT NULL,
     current_day INT NOT NULL,
     current_hour int NOT NULL

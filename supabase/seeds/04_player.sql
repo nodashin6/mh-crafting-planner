@@ -1,3 +1,3 @@
-INSERT INTO public.players (name)
-VALUES
-    ('Admin');
+-- INSERT INTO public.players (name)
+-- VALUES
+--     ('Admin');
