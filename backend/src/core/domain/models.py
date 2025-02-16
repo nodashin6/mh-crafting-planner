@@ -57,13 +57,13 @@ class Belonging(UuidEntity):
 
 class Facility(NamedEntity):
     savedata: Savedata
-    mixser: Mixer
+    mixer: Mixer
 
 
 class Schedule(UuidEntity):
     savedata: Savedata
     craft: Craft
-    mixser: Mixer
+    mixer: Mixer
     quantity: int
     start_day: int
     start_hour: int

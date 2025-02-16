@@ -58,7 +58,7 @@ class ApiClient {
 
 
 const createBackendClient = (path) => {
-  return new ApiClient("http://localhost:8021", path);
+  return new ApiClient(url, path);
 }
 
 
